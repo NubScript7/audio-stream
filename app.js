@@ -1,4 +1,4 @@
-const ip = require('ip');
+const ip = require('./ip');
 const express = require('express');
 const app = express();
 const server = require('http').Server(app);
