@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>LISTENER</title>
+</head>
+<body>
+	<h1>Listening: 0000</h1>
+	<input id="port" placeholder="audio port: ">
+	<button id="listen">LISTEN</button>
+	<audio id="audioEl" controls></audio>
+	<script src="socket.io/socket.io.js"></script>
+	<script>
+		const socket = io();
+		const audEl = document.getElementById('audioEl');
+		const portEl = document.getElementById('port');
+		const listenEl = document.getElementById('listen');
+		const h1El = document.querySelector('h1');
+
+		listenEl.addEventListener('click',()=>{
+			if(!portEl.value)return;
+			h1El.textContent = 'Listening: '+portEl.value.padStart(4,'0');
+			socket.on(`audio:${portEl.value}`, blob => {
+				let audio = new Blob([blob]);
+				audEl.src = URL.createObjectURL(audio);
+				audEl.play();
+			})
+		})
+	</script>
+</body>
+</html>
+

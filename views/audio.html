@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="X-UA-Compatible" content="ie=edge">
+	<title>AUDIO</title>
+</head>
+<body>
+	<h1>PORT: 0000</h1>
+	<audio id="audel" src="" controls></audio>
+	<script src="socket.io/socket.io.js"></script>
+	<script>
+		const socket = io();
+	  	const audEl = document.getElementById('audel');
+	  	const h1El = document.querySelector('h1');
+
+		const audioConstraints = {
+			audio: true
+		}
+socket.emit('request-port');
+socket.on('available-port',port=>{
+const padPort = String(port).padStart(4,'0')
+h1El.textContent='PORT: ' + padPort;
+navigator.mediaDevices.getUserMedia(audioConstraints)
+.then(audioStream=>{
+let mediaRecorder = new MediaRecorder(audioStream);
+
+const audioFormat = 'audio/webm;codecs=opus';
+
+function record(s=5000){
+	mediaRecorder = new MediaRecorder(audioStream);
+	mediaRecorder.ondataavailable = (event) => {
+		socket.emit('audio',padPort,event.data);
+	}
+	mediaRecorder.start();
+	setTimeout(()=>{
+		mediaRecorder.stop();
+		record();
+	},s)
+}
+
+record();
+
+})
+.catch(err=>{
+	console.log(err.message)
+});
+})
+
+	</script>
+</body>
+</html>
